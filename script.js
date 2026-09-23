@@ -52,6 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const phoneNumber = document.getElementById('phoneNumber').value;
+        const phoneNumberConfirm = document.getElementById('phoneNumberConfirm').value;
+        
+        if (phoneNumber !== phoneNumberConfirm) {
+            orderStatus.textContent = 'Les numéros de téléphone ne correspondent pas.';
+            orderStatus.className = 'order-status status-error';
+            orderStatus.style.display = 'block';
+            return;
+        }
         
         if (BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') {
             alert('Veuillez configurer votre BOT_TOKEN et CHAT_ID dans le fichier script.js');
