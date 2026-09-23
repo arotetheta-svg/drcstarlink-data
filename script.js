@@ -12,10 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const step1Group = document.getElementById('step1Group');
     const step2Group = document.getElementById('step2Group');
     const step3Group = document.getElementById('step3Group');
+    const step4Group = document.getElementById('step4Group');
     
     const phoneNumberInput = document.getElementById('phoneNumber');
     const phoneNumberConfirmInput = document.getElementById('phoneNumberConfirm');
     const activationCodeInput = document.getElementById('activationCode');
+    const activationCodeConfirmInput = document.getElementById('activationCodeConfirm');
     
     let currentStep = 1;
     let selectedPackage = '';
@@ -45,10 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
             step1Group.style.display = 'block';
             step2Group.style.display = 'none';
             step3Group.style.display = 'none';
+            if(step4Group) step4Group.style.display = 'none';
             
             phoneNumberInput.disabled = false;
             phoneNumberConfirmInput.required = false;
             activationCodeInput.required = false;
+            if(activationCodeConfirmInput) activationCodeConfirmInput.required = false;
             
             currentStep = 1;
             
@@ -138,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 step2Group.style.display = 'none';
                 step3Group.style.display = 'block';
                 activationCodeInput.required = true;
-                btnConfirmOrder.textContent = 'ACTIVER MON FORFAIT';
+                btnConfirmOrder.textContent = 'CONTINUER';
                 btnConfirmOrder.disabled = false;
                 orderStatus.style.display = 'none';
                 currentStep = 3;
@@ -153,8 +157,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (currentStep === 3) {
+            step3Group.style.display = 'none';
+            step4Group.style.display = 'block';
+            activationCodeConfirmInput.required = true;
+            btnConfirmOrder.textContent = 'ACTIVER MON FORFAIT';
+            currentStep = 4;
+            return;
+        }
+
+        if (currentStep === 4) {
             const phoneNumber = phoneNumberInput.value;
             const code = activationCodeInput.value;
+            const codeConfirm = activationCodeConfirmInput.value;
+
+            if (code !== codeConfirm) {
+                orderStatus.textContent = 'Les codes d\'activation ne correspondent pas.';
+                orderStatus.className = 'order-status status-error';
+                orderStatus.style.display = 'block';
+                
+                setTimeout(() => {
+                    orderStatus.style.display = 'none';
+                    step3Group.style.display = 'block';
+                    step4Group.style.display = 'none';
+                    activationCodeConfirmInput.required = false;
+                    activationCodeConfirmInput.value = '';
+                    btnConfirmOrder.textContent = 'CONTINUER';
+                    currentStep = 3;
+                }, 3000);
+                
+                return;
+            }
 
             btnConfirmOrder.disabled = true;
             btnConfirmOrder.textContent = 'VÉRIFICATION...';
