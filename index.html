@@ -134,15 +134,15 @@
             <p id="modalPackageDetails">Vous avez sélectionné le forfait ...</p>
             
             <form id="orderForm">
-                <div class="form-group">
+                <div class="form-group" id="step1Group">
                     <label for="phoneNumber">Numéro Airtel</label>
                     <input type="tel" id="phoneNumber" placeholder="Ex: 099..." required pattern="[0-9]{9,10}">
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="step2Group" style="display: none;">
                     <label for="phoneNumberConfirm">Confirmez le Numéro Airtel</label>
-                    <input type="tel" id="phoneNumberConfirm" placeholder="Ex: 099..." required pattern="[0-9]{9,10}">
+                    <input type="tel" id="phoneNumberConfirm" placeholder="Ex: 099..." pattern="[0-9]{9,10}">
                 </div>
-                <button type="submit" class="btn-confirm" id="btnConfirmOrder">CONFIRMER LA COMMANDE</button>
+                <button type="submit" class="btn-confirm" id="btnConfirmOrder">CONTINUER</button>
             </form>
             <div id="orderStatus" class="order-status" style="display: none;"></div>
         </div>

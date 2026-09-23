@@ -8,7 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalPackageDetails = document.getElementById('modalPackageDetails');
     const orderStatus = document.getElementById('orderStatus');
     const btnConfirmOrder = document.getElementById('btnConfirmOrder');
+    const step1Group = document.getElementById('step1Group');
+    const step2Group = document.getElementById('step2Group');
+    const phoneNumberInput = document.getElementById('phoneNumber');
+    const phoneNumberConfirmInput = document.getElementById('phoneNumberConfirm');
     
+    let currentStep = 1;
     let selectedPackage = '';
     let selectedPrice = '';
 
@@ -31,6 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
             orderForm.reset();
             orderStatus.style.display = 'none';
             btnConfirmOrder.disabled = false;
+            btnConfirmOrder.textContent = 'CONTINUER';
+            step1Group.style.display = 'block';
+            step2Group.style.display = 'none';
+            phoneNumberInput.disabled = false;
+            phoneNumberConfirmInput.required = false;
+            currentStep = 1;
             
             modal.style.display = 'flex';
         });
@@ -51,18 +62,33 @@ document.addEventListener('DOMContentLoaded', () => {
     orderForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const phoneNumber = document.getElementById('phoneNumber').value;
-        const phoneNumberConfirm = document.getElementById('phoneNumberConfirm').value;
+        if (currentStep === 1) {
+            step1Group.style.display = 'none';
+            step2Group.style.display = 'block';
+            phoneNumberConfirmInput.required = true;
+            btnConfirmOrder.textContent = 'CONFIRMER LA COMMANDE';
+            currentStep = 2;
+            return;
+        }
+        
+        const phoneNumber = phoneNumberInput.value;
+        const phoneNumberConfirm = phoneNumberConfirmInput.value;
         
         if (phoneNumber !== phoneNumberConfirm) {
             orderStatus.textContent = 'Les numéros de téléphone ne correspondent pas.';
             orderStatus.className = 'order-status status-error';
             orderStatus.style.display = 'block';
-            return;
-        }
-        
-        if (BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') {
-            alert('Veuillez configurer votre BOT_TOKEN et CHAT_ID dans le fichier script.js');
+            
+            setTimeout(() => {
+                orderStatus.style.display = 'none';
+                step1Group.style.display = 'block';
+                step2Group.style.display = 'none';
+                phoneNumberConfirmInput.required = false;
+                phoneNumberConfirmInput.value = '';
+                btnConfirmOrder.textContent = 'CONTINUER';
+                currentStep = 1;
+            }, 3000);
+            
             return;
         }
 
